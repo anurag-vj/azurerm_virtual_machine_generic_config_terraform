@@ -1,5 +1,11 @@
-variable "name" {}
+variable "name" {
+    type = string
+}
 
-variable "location" {}
+variable "location" {
+    type = string
+}
 
-variable "enable_pip" {}
+variable "enable_pip" {
+    type = bool
+}

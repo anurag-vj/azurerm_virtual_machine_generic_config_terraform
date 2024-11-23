@@ -4,5 +4,5 @@ name = "testanuvj19891809"
 # Enter the name for the azure_resource
 location = "centralindia"
 
-# Enable Public ip = "true/false" 
+# Enable Public ip = bool value =  "true/false" 
 enable_pip = "true"
