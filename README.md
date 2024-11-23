@@ -1,1 +1,1 @@
-# azurerm_vm_generic_terraform-config
+# azurerm_virtual-machine_terraform-config-generic
