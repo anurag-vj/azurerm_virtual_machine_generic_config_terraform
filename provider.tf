@@ -11,5 +11,3 @@ provider "azurerm" {
   features {}
   subscription_id = "#Provide"
 }
-
-provider "random" {}
