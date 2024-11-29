@@ -9,3 +9,7 @@ variable "location" {
 variable "enable_pip" {
     type = bool
 }
+
+variable "vm_password" {
+    type = string
+}

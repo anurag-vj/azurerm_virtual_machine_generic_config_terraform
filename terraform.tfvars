@@ -6,3 +6,6 @@ location = "centralindia"
 
 # Enable Public ip = bool value =  "true/false" 
 enable_pip = "true"
+
+# Credentials for the Virtual Machine
+vm_password = "testadmin@123890"

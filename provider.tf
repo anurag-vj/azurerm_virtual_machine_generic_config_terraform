@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "#Provide"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = "#Provide"
-    }
   }
 }
 
