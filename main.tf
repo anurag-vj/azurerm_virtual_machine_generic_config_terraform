@@ -51,19 +51,13 @@ resource "azurerm_network_interface" "Network-Interface" {
   }
 }
 
-resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
 resource "azurerm_linux_virtual_machine" "Virtual-Machine" {
   name                            = "vm-${var.name}"
   location                        = azurerm_resource_group.Resource-Group.location
   resource_group_name             = azurerm_resource_group.Resource-Group.name
   size                            = "Standard_DS3_v2"
   admin_username                  = "testadmin"
-  admin_password                  = random_password.password.result
+  admin_password                  = var.vm_password
   disable_password_authentication = "false"
   network_interface_ids           = [azurerm_network_interface.Network-Interface.id]
 
