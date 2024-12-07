@@ -1,15 +1,15 @@
 variable "name" {
-    type = string
+  type = string
 }
 
 variable "location" {
-    type = string
+  type = string
 }
 
 variable "enable_pip" {
-    type = bool
+  type = bool
 }
 
 variable "vm_password" {
-    type = string
+  type = string
 }
