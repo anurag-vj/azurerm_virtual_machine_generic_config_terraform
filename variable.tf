@@ -11,5 +11,10 @@ variable "enable_pip" {
 }
 
 variable "vm_password" {
+  type      = string
+  sensitive = true
+}
+
+variable "subscription_id" {
   type = string
 }

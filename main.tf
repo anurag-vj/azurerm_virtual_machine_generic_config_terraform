@@ -1,65 +1,75 @@
-resource "azurerm_resource_group" "Resource-Group" {
+resource "azurerm_resource_group" "rg" {
   name     = "rg-${var.name}"
   location = var.location
 }
 
-resource "azurerm_storage_account" "Storage-Account" {
-  name                     = "strg${var.name}"
-  location                 = azurerm_resource_group.Resource-Group.location
-  resource_group_name      = azurerm_resource_group.Resource-Group.name
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
-resource "azurerm_storage_container" "Stoarge-Container" {
-  name               = "container${var.name}"
-  storage_account_id = azurerm_storage_account.Storage-Account.id
-}
-
-resource "azurerm_virtual_network" "Virtual-Network" {
+resource "azurerm_virtual_network" "vnet" {
   name                = "vnet-${var.name}"
-  location            = azurerm_resource_group.Resource-Group.location
-  resource_group_name = azurerm_resource_group.Resource-Group.name
-  address_space       = ["192.168.0.0/16"]
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  address_space       = ["10.10.10.0/24"]
 }
 
-resource "azurerm_subnet" "Subnet" {
+resource "azurerm_subnet" "subnet" {
   name                 = "snet-vnet-${var.name}"
-  resource_group_name  = azurerm_resource_group.Resource-Group.name
-  virtual_network_name = azurerm_virtual_network.Virtual-Network.name
-  address_prefixes     = ["192.168.1.0/24"]
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.10.10.0/29"]
 }
 
-resource "azurerm_public_ip" "Public-IP" {
-  count               = var.enable_pip ? 1 : 0
-  name                = "pip-${var.name}"
-  location            = azurerm_resource_group.Resource-Group.location
-  resource_group_name = azurerm_resource_group.Resource-Group.name
-  allocation_method   = "Static"
-}
+resource "azurerm_network_security_group" "nsg" {
+  name                = "nsg-${var.name}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
 
-resource "azurerm_network_interface" "Network-Interface" {
-  name                = "nic-${var.name}"
-  location            = azurerm_resource_group.Resource-Group.location
-  resource_group_name = azurerm_resource_group.Resource-Group.name
-
-  ip_configuration {
-    name                          = "nic-ipconfig-${var.name}"
-    subnet_id                     = azurerm_subnet.Subnet.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = var.enable_pip ? azurerm_public_ip.Public-IP[0].id : null
+  security_rule {
+    name                       = "nsg-rule-${var.name}"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
 }
 
-resource "azurerm_linux_virtual_machine" "Virtual-Machine" {
+resource "azurerm_public_ip" "public-ip" {
+  count               = var.enable_pip ? 1 : 0
+  name                = "pip-${var.name}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+}
+
+resource "azurerm_network_interface" "nic" {
+  name                = "nic-${var.name}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = "nic-ipconfig-${var.name}"
+    subnet_id                     = azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = var.enable_pip ? azurerm_public_ip.public-ip[0].id : null
+  }
+}
+
+resource "azurerm_network_interface_security_group_association" "nsg-association" {
+  network_interface_id      = azurerm_network_interface.nic.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
+
+resource "azurerm_linux_virtual_machine" "linux-vm" {
   name                            = "vm-${var.name}"
-  location                        = azurerm_resource_group.Resource-Group.location
-  resource_group_name             = azurerm_resource_group.Resource-Group.name
-  size                            = "Standard_DS3_v2"
+  location                        = azurerm_resource_group.rg.location
+  resource_group_name             = azurerm_resource_group.rg.name
+  size                            = "Standard_D2s_v3"
   admin_username                  = "testadmin"
   admin_password                  = var.vm_password
   disable_password_authentication = "false"
-  network_interface_ids           = [azurerm_network_interface.Network-Interface.id]
+  network_interface_ids           = [azurerm_network_interface.nic.id]
 
   os_disk {
     caching              = "ReadWrite"

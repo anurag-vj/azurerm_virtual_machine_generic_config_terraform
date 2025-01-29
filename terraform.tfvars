@@ -1,5 +1,5 @@
 # Enter the name for assign to the azure_resource
-name = "testanuvj19891809"
+name = "azure-sample-001"
 
 # Enter the name for the azure_resource
 location = "centralindia"
@@ -8,4 +8,7 @@ location = "centralindia"
 enable_pip = "true"
 
 # Credentials for the Virtual Machine
-vm_password = "testadmin@123890"
+vm_password = "rootadmin@123"
+
+# Enter the subscription id
+subscription_id = "1863e903-68c1-4e05-a0cb-40e0bcb9a2df"
